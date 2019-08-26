@@ -1,4 +1,10 @@
 # app_motorista
 Comandos de inicialização
-  <div>npm install</div>
-  ionic serve
+  <ul>
+    <li>
+      npm install
+    </li>
+    <li>
+      ionic serve
+    </li
+  </ul>
