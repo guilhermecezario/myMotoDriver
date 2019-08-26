@@ -77,25 +77,25 @@ export class HomePage {
     });
   }
   buscarPedidos(){
-    console.log('entrou');  
     this.carregando = true;
-    this.pedidos = [];
-    this.db.database.ref('/pedidos').on('child_added', (data) =>{
-      let dados = data.val();
+    this.db.database.ref('/pedidos').on('value', (data)=>{
+      this.pedidos = [];
+      data.forEach((item)=>{
+        let dados = item.val();
       if(dados.motorista == ""){
-        let pedido = new Pedido(dados.usuario, data.key, dados.preco);
-        this.zone.run(() => {
+        let pedido = new Pedido(dados.usuario, item.key, dados.preco);
+        this.zone.run(()=> {
           this.pedidos.push(pedido);
-          console.log(this.pedidos);
-      });
+        });
       }
-      else if(dados.motorista == this.uid){
+      else if(dados.motorista == this.uid && dados.status == ""){
         this.navCtrl.push(MapaPage, {
-          id: data.key,
+          id: item.key,
           id_motorista: this.uid,
           estado: '1'
         });
       }
+      })
     });
   }
   abrirMapa(id: string){

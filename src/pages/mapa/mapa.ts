@@ -56,7 +56,7 @@ export class MapaPage {
         listDB.once('value', (snapshot) => {
         
             let info = snapshot.val();
-            if(info != null){
+            if(info != undefined){
                 if(this.estado == '1'){
                     this.pedido = false;
                     this.final = true;
