@@ -1,0 +1,25 @@
+<ion-content class="background">
+  <div class="align-input">
+    <div class="center">
+        <img src="./assets/imgs/logo.png" class="logo">
+      </div>
+      <div class="center margin-top-20">
+        <div class="background-input">
+          <ion-input type="text" [(ngModel)]="user.email" placeholder="E-mail" class="input"></ion-input>
+        </div>
+        <div class="background-input">
+          <ion-input type="password" [(ngModel)]="user.password" placeholder="Senha" class="input"></ion-input>
+        </div>
+        <div class="senha center mg-top-20" (click)="esqueceuSenha()">
+          Esqueceu sua senha?
+        </div>
+        </div>
+    
+        <div (click)="login(user)" class="center botao bold mg-top-20">
+      Entrar
+    </div>
+    <div (click)="register()" class="center bold white mg-top-20 font-18">
+      Cadastrar
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,181 @@
+	@font-face {
+	font-family: gidole_regular;
+	src: url(../assets/fonts/Gidole-regular.otf) format("otf");
+	font-weight: 200
+	}
+@font-face {
+	font-family: kollekfit;
+	src: url(../assets/fonts/kollektif-bold.ttf) format("ttf");
+	font-weight: 200
+}
+.background{
+	background-color: #292838;
+}
+.margin-30{
+	margin-top: 30%;
+}
+.margin-20{
+	margin-top: 20%;
+}
+.center{
+	text-align: center;
+}
+.bold{
+	font-weight: 700;																
+}
+.bold-2{
+	font-weight: 350;
+}
+.texto{
+	font-size: 30px;
+	font-family: kollekfit !important;
+	width: 90%;
+	margin-left: auto;
+    margin-right: auto;
+}
+.texto-2{
+	font-size: 25px;
+	font-family: gidole_regular !important;
+	width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.texto-3{
+	font-size: 18px;
+}
+.mg-top-60{
+	margin-top: 60px;
+}
+.mg-top-40{
+	margin-top: 40px;
+}
+.mg-top-30{
+	margin-top: 30px;
+}
+.mg-top-20{
+	margin-top: 20px;
+}
+.mg-top-10{
+	margin-top: 10px;
+}
+.mg-top-15{
+	margin-top: 15px;
+}
+.ctaBotao{
+	padding: 15px;
+	font-size:20px;
+	background: #F9495D;
+	width: 100%;
+	border-radius: 5px;
+	color: #FFF;
+}
+.input{
+	margin-top: 5%;
+	width: 100%;
+	font-size: 20px;
+}
+.logo{
+	width: 40%;
+}
+.transparent{
+	background: transparent;
+}
+.padding-top-20{
+	padding-top: 20px;
+}
+.mg-bottom-20{
+	margin-bottom: 20px;
+}
+.mg-bottom-10{
+	margin-bottom: 20px;
+}
+.padding-bottom-20{
+	padding-bottom: 20px;
+}
+.padding-bottom-30{
+	padding-bottom: 30px;
+}
+.padding-30{
+	padding: 30px;
+}
+.padding-20{
+	padding: 20px;
+}
+/*ion-content{
+	width: 100%;
+	height: 100%;
+	width: 100%;
+	height: 100%;
+	background: url('../assets/gif/mulher-moto.gif');
+	background-size: cover;
+	background-position: center;
+}*/
+.image{
+	width: 100%;
+}
+.user-profile {
+	.user-avatar{
+		width: center;
+		height: center;
+		text-align: center;
+		display: inline-block;
+		border-radius: 50%;
+		//box-shadow: inset 0 0 10rem rgba(0,0,0,.25), 0 0 4rem rgba(255,255,255,.45);
+		img {
+			
+			border-radius: 50%;
+			width: 30%;
+		}
+	}
+	.column {
+		text-align: center;
+		margin-right: 5%;
+		width: 90%;
+		color: #F9495D;
+	}
+}
+.text-white {
+	color: #fff;
+}
+.no-margin {
+	margin: 0;
+}
+.foto-perfil{
+	width: 30%;
+	display: inline-block;
+	border-radius: 50%;
+	border: solid 1px black;
+}
+.background-botao{
+	width: 100%;
+}
+.align-input{
+	position: fixed;
+	top: 50%;
+	transform: translateY(-50%); 
+}
+.alert{
+	.alert-wrapper{
+		text-align: center;
+		border-radius: 5%;
+
+		.alert-button {
+			color: #292838;
+		}
+		
+	}
+	.alert-title{
+		font-size: 20px;
+		text-align: center;
+	}
+}
+.loading{
+	background-color: rgba(#292838, 0.8);
+	.loading-wrapper{
+		background-color: transparent;
+  }
+}
+.loadingPerfil{
+  background-color: rgba(#292838, 0.95);
+}
+//#FA991C
