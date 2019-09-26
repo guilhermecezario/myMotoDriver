@@ -12,11 +12,13 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 })
 export class RegisterPage {
 
-  private PATH = 'pendentes/';
+  loading = this.loadingCtrl.create({
+    content: 'Carregando...'
+  });
 
-  infoMoto = true;
-  infoUser = false;
-  infoCnh = false;
+  registerMoto = true;
+  registerUser = false;
+  registerCnh = false;
   final = false;
   id: any;
 
@@ -58,21 +60,15 @@ export class RegisterPage {
 
   detalhesMoto(){
     if(this.placa == undefined || this.cor == undefined){
-      this.toast.create({
-        message: 'Você precisa preencher todos os campos',
-        duration: 3000
-      }).present();
+      this.createToast('Você precisa preencher todos os campos');
     }else{
       if(this.placa.length != 7){
-        this.toast.create({
-          message: 'Opa... placa informada não tem quantidades de digitos compativeis',
-          duration: 4000
-        }).present();
+        this.createToast('Opa... placa informada não tem quantidades de digitos compativeis');
     }else{
-        this.infoMoto = false;
-        this.infoCnh = true;
-        this.infoUser = false;
-        this.final = false;
+      this.registerMoto = false;
+      this.registerCnh = true;
+      this.registerUser = false;
+      this.final = false;
     }
   }
   }
@@ -85,48 +81,33 @@ export class RegisterPage {
         this.buscarImg = false;
         this.continuar = true;
       }else{
-        this.toast.create({
-          message: 'Você precisa selecionar uma imagem para continuar',
-          duration: 3000
-        }).present();
+        this.createToast('Você precisa selecionar uma imagem para continuar');
       }
   });
   }
   
   async register(user: User) {
     if(user.email == undefined || user.password == undefined || this.confirm_pass == undefined || this.nome == undefined){
-      this.toast.create({
-        message: 'Preencha todos os campos',
-        duration: 3000
-      }).present();
+      this.createToast('Preencha todos os campos');
     }else{
       if(user.password == this.confirm_pass){
         try {
+          this.loading.present();
           this.afAuth.auth.createUserWithEmailAndPassword(user.email, user.password)
           .then((res: any) =>{
 
-            this.setId(res.user.uid);
+            this.id = res.user.uid;
             this.finalizarCadastro();
 
           }).catch((error: any) =>{
-
-            console.log(error.code);
+            this.loading.dismiss();
 
             if(error.code == 'auth/network-request-failed'){
-              this.toast.create({
-                message: 'Vish amigo, você não está conectado a internet',
-                duration: 3000
-              }).present();
+              this.createToast('Vish amigo, você não está conectado a internet');
             }else if(error.code == 'auth/email-already-in-use'){
-              this.toast.create({
-                message: 'E-mail ja cadastrado',
-                duration: 3000
-              }).present();
+              this.createToast('E-mail ja cadastrado');
             }else if(error.code == 'auth/weak-password'){
-              this.toast.create({
-                message: 'Senha precisa ter mais de 6 caracteres',
-                duration: 3000
-              }).present();
+              this.createToast('Senha precisa ter mais de 6 caracteres');
             }else{
               console.log(error);
             }
@@ -137,17 +118,13 @@ export class RegisterPage {
         }
       }
       else{
-        this.toast.create({
-          message: 'Senha não confere com a confirmação',
-          duration: 3000
-        }).present();
+        this.createToast('Senha não confere com a confirmação');
       }
     }
   }
 
   finalizarCadastro(){
-    this.presentLoadingDefault();
-    this.db.database.ref(this.PATH).child(this.getId())
+    this.db.database.ref('pendentes/').child(this.id)
       .set({ 
         nome: this.nome,
               placa: this.placa,
@@ -157,17 +134,19 @@ export class RegisterPage {
               senha: this.user.password
             }).then(
             () => {
-              this.infoUser = false;
-              this.infoMoto = false;
-              this.infoCnh = false;
+              this.loading.dismiss();
+
+              this.registerUser = false;
+              this.registerMoto = false;
+              this.registerCnh = false;
               this.final = true;
             });  
   }
 
   abrirInfoUser(){
-    this.infoUser = true;
-    this.infoMoto = false;
-    this.infoCnh = false;
+    this.registerUser = true;
+    this.registerMoto = false;
+    this.registerCnh = false;
     this.final = false;
   }
 
@@ -178,18 +157,14 @@ export class RegisterPage {
     return this.id;
   }
 
-  Login(){
+  abrirLogin(){
     this.navCtrl.pop();
   }
-  presentLoadingDefault() {
-    let loading = this.loadingCtrl.create({
-      content: 'Aguarde, Carregando...'
-    });
-  
-    loading.present();
-  
-    setTimeout(() => {
-      loading.dismiss();
-    }, 3000);
+
+  createToast(text){
+    this.toast.create({
+      message: text,
+      duration: 3000
+    }).present();
   }
 }

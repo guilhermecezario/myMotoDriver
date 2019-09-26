@@ -1,31 +1,54 @@
-.margin-top-30{
-    margin-top: 30%;
-}
-.white{
-    color: #FFF;
-}
-.background-input{
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 5px;
-    background-color: #FFF;
-}
-.input{
-    margin-top: 5%;
-    width: 100%;
-    font-size: 20px;
-}
-.botao{
-    padding: 15px;
-    font-size:20px;
-    background: #F9495D;
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 5px;
-    color: #FFF;
-}
-.font-18{
-    font-size: 18px;
+page-register{
+    .centerContent{
+        background-color: #292838;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .logo{
+        width: 150px;
+    }
+    .input{
+        background-color: #FFF;
+        margin-top: 15px;
+        width: 300px;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+    .buttonNext{
+        margin-top: 15px;
+        text-align: center;
+        padding: 10px;
+        font-size:20px;
+        background: #F9495D;
+        width: 300px;
+        border-radius: 5px;
+        color: #FFF;
+    }
+    .buttonBack{
+        font-size: 20px;
+        margin-top: 15px;
+        color: #FFF;
+        font-weight: 800;
+    }
+    .image{
+        width: 80%;
+        margin-bottom: 30px;
+    }
+    .text-1{
+        font-size: 25px;
+        color: #FFF;
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+    .text-2{
+        font-size: 20px;
+        color: #FFF;
+        margin-bottom: 20px;
+        width: 90%;
+        text-align: center;
+    }
 }

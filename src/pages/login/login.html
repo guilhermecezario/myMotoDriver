@@ -1,5 +1,5 @@
-<ion-content class="background">
-  <div class="align-input">
+<ion-content class="content">
+  <!-- <div class="align-input">
     <div class="center">
         <img src="./assets/imgs/logo.png" class="logo">
       </div>
@@ -19,6 +19,24 @@
       Entrar
     </div>
     <div (click)="register()" class="center bold white mg-top-20 font-18">
+      Cadastrar
+    </div>
+  </div> -->
+  <div class="centerContent">
+    <div>
+      <img src="../../assets/imgs/logo.png" class="logo">
+    </div>
+
+    <input type="email" placeholder="E-mail" [(ngModel)]="user.email" class="input">
+    <input type="password" placeholder="senha" [(ngModel)]="user.password" class="input">
+
+    <div class="forgotPassword" (click)="esqueceuSenha()">
+      <p>Esqueceu a senha?</p>
+    </div>
+    <div class="buttonEnter" (click)="login(user)">
+      Entrar
+    </div>
+    <div class="register" (click)="register()">
       Cadastrar
     </div>
   </div>

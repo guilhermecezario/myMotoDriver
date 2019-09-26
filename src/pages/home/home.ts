@@ -1,6 +1,5 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
-import { Network } from '@ionic-native/network';
 
 //firebase
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -30,9 +29,9 @@ export class HomePage {
 
   uid: string;
   list: any [];
-  info: any;
+  userDate: any;
 
-  carregando: boolean = false;
+  reload: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -40,22 +39,10 @@ export class HomePage {
     private afAuth: AngularFireAuth,
     private toast: ToastController,
     private db: AngularFireDatabase,
-    public zone: NgZone,
-    private network: Network){
+    public zone: NgZone){
   }
 
   ionViewWillEnter() {
-    let disconnectSubscription = this.network.onDisconnect().subscribe(() => {
-      this.errorInternet.present();
-    });
-
-    let connectSubscription = this.network.onConnect().subscribe(() => {
-      this.errorInternet.dismiss();
-    });
-
-    disconnectSubscription.unsubscribe();
-    connectSubscription.unsubscribe();
-
     this.buscarDados();
   }
 
@@ -65,9 +52,9 @@ export class HomePage {
         this.uid = data.uid;
         let listDB = this.db.database.ref(this.PATH).child(this.uid);
         listDB.once('value', (snapshot) => {
-          this.info = snapshot.val();
-          if(this.info.perfil == ""){
-            this.info.perfil = "../assets/imgs/default-user.png";
+          this.userDate = snapshot.val();
+          if(this.userDate.perfil == ""){
+            this.userDate.perfil = "../assets/imgs/default-user.png";
           }
             this.buscarPedidos();
         })
@@ -77,7 +64,7 @@ export class HomePage {
     });
   }
   buscarPedidos(){
-    this.carregando = true;
+    this.reload = false;
     this.db.database.ref('/pedidos').on('value', (data)=>{
       this.pedidos = [];
       data.forEach((item)=>{
@@ -109,7 +96,7 @@ export class HomePage {
   logout(){
     return this.afAuth.auth.signOut().then(() =>{
       this.toast.create({
-        message: this.info.nome+' você desconectou da sua conta',
+        message: this.userDate.nome+' você desconectou da sua conta',
         duration: 4000
       }).present();
       this.navCtrl.setRoot('LoginPage');

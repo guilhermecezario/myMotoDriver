@@ -1,46 +1,40 @@
-<ion-menu [content]="content" class="my-custom-menu">
-  <ion-header *ngIf="info">
-    <ion-toolbar class="user-profile">
-      <div class="user-avatar">
-        <img src="{{info.perfil}}">
-      </div>
-      <div class="menu-nome">
-        {{info.nome}}
-      </div>
-      <div class="center botao-menu" (click)="abrirPerfil()">
-        <ion-icon name="contact"></ion-icon>
-        Ver perfil
-      </div>
-    </ion-toolbar>
-  </ion-header>
-    <ion-content>
-      <ion-list>
-        <button ion-item menuClose class="botao-list-menu">
-          Home
-        </button>
-        <button ion-item (click)= "logout()" menuClose class="botao-list-menu">          
+<ion-menu [content]="content" class="ContentMenu">
+    <ion-header class="HeaderMenu" *ngIf="userDate">
+      <ion-toolbar>
+        <div>
+          <img [src]="userDate.perfil">
+        </div>
+        <div>
+          <p>{{userDate.nome}}</p>
+        </div>
+        <div class="buttonMenu" (click)="abrirPerfil()">
+          <ion-icon name="contact"></ion-icon>
+          Ver perfil
+        </div>
+      </ion-toolbar>
+    </ion-header>
+      <ion-content>
+        <button ion-item (click)= "logout()" menuClose class="buttonListMenu">          
           Sair
         </button>
-      </ion-list>
-    </ion-content>
-  </ion-menu>
+      </ion-content>
+    </ion-menu>
+    <ion-nav id="nav" #content [root]="rootPage"></ion-nav>
 
-  <ion-nav id="nav" #content [root]="rootPage"></ion-nav>
-
-  <ion-header>
-    <ion-navbar>
-      <button ion-button menuToggle icon-only class="text-white">
-        <ion-icon name='menu'></ion-icon>
-      </button>
-      <div class="text-white font-18">Pedidos</div>
-    </ion-navbar>
-  </ion-header>
+    <ion-header>
+      <ion-navbar>
+        <button ion-button menuToggle [disabled]="userDate == undefined">
+          <ion-icon name='menu'></ion-icon>
+        </button>
+        <ion-title>Pedidos</ion-title>
+      </ion-navbar>
+    </ion-header>
 
 <ion-content class="content">
   <ion-refresher (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-    <div *ngIf="pedidos.length > 0 && carregando == true" class="list">
+    <div *ngIf="pedidos.length > 0 && reload == false" class="list">
       <ion-list *ngFor="let p of pedidos">
         <ion-item (click)="abrirMapa(p.getId())" class="list-pedido">
           <div class="list-nome">Nome: {{p.getUsuario()}}</div>
@@ -48,20 +42,15 @@
         </ion-item>
       </ion-list>
     </div>
-      <div class="center center-block" *ngIf="pedidos.length == 0 && carregando == true">
-        <div class="text-sem-pedidos">
-          Sem pedidos
-        </div>
-        <div class="mg-top-20 text-buscar">
-          <div>
-              Deslize para buscar mais
-          </div>
-          <div>
-            <ion-icon ios="ios-arrow-down" md="md-arrow-down"></ion-icon>
-          </div>
-        </div>
+    <div class="centerText" *ngIf="reload">
+      <p>Carregando...</p>
+    </div>
+    <div class="centerText" *ngIf="pedidos.length == 0 && reload == false">
+      <div>
+        Deslize para buscar mais
       </div>
-  <div class="center center-block text-sem-pedidos" *ngIf="carregando == false">
-    Carregando...
-  </div>
+      <div>
+        <ion-icon ios="ios-arrow-down" md="md-arrow-down"></ion-icon>
+      </div>
+    </div>
 </ion-content>

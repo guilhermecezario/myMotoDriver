@@ -51,10 +51,7 @@ export class MapaPage {
     }
 
     pegarDados(){
-        let listDB = this.db.database.ref('pedidos').child(this.uid);
-        
-        listDB.once('value', (snapshot) => {
-        
+        this.db.database.ref('pedidos').child(this.uid).once('value', (snapshot) => {
             let info = snapshot.val();
             if(info != undefined){
                 if(this.estado == '1'){
@@ -65,11 +62,10 @@ export class MapaPage {
                 this.destinoPosition = info.destinoLat+", "+info.destinoLng;
                 this.pegarLocalizacao();                                            
             }else{
-                let toast = this.toastCtrl.create({
+                this.toastCtrl.create({
                     message: 'Esse pedido não existe mais',
                     duration: 4000
-                });
-                toast.present();
+                }).present();
                 this.navCtrl.pop();
             }
         });
@@ -83,8 +79,11 @@ export class MapaPage {
                 console.log("Posição atual: "+resp.coords.latitude, resp.coords.longitude);
             }).catch(
             (error) => {
-                console.log('Error getting location', error);
-                console.log("erro no geolocation");
+                this.toastCtrl.create({
+                    message: 'Ops deu algum erro com seu GPS',
+                    duration: 4000
+                }).present();
+                this.navCtrl.pop();
         });
     }
 
@@ -110,7 +109,6 @@ export class MapaPage {
     }
 
     traceRoute(service: any, display: any, request: any) {
-
         service.route(request, function (result, status) {
             if (status == 'OK') {
                 display.setDirections(result);
@@ -121,19 +119,20 @@ export class MapaPage {
     opcoesPedido() {
         const actionSheet = this.actionSheetCtrl.create({
             title: 'Aceitar corrida',
-            cssClass: 'action-sheets-basic-page',
+            cssClass: 'action-sheets-groups-page',
             buttons: [
                 {
                     text: 'Aceitar',
                     role: 'destructive',
+                    icon: 'open',
                     handler: () => {
                         this.aceitarPedidos();
-                        console.log('aceito');
                         this.pedido = false;
                         this.final = true;
                     }
                 },{
                     text: 'Cancelar',
+                    icon: 'ios-close',
                     handler: () => {
                         this.navCtrl.pop();
                     }
@@ -149,9 +148,10 @@ export class MapaPage {
         buttons: [
         {
             text: 'Corrida finalizada',
+            icon: 'ios-checkmark',
             role: 'destructive',
             handler: () => {
-            let alert = this.alertCtrl.create({
+            this.alertCtrl.create({
                 title: 'Essa corrida foi finalizada?',
                 buttons: [
                 {
@@ -167,15 +167,15 @@ export class MapaPage {
                 }
                 }
             ]
-            });
-            alert.present();
+            }).present();
             }
         },
         {
             text: 'Cancelar corrida',
+            icon: 'ios-undo',
             role: 'destructive',
             handler: () => {
-            let alert = this.alertCtrl.create({
+            this.alertCtrl.create({
                 title: 'Deseja cancelar essa corrida?',
                 buttons: [
                     {
@@ -192,11 +192,11 @@ export class MapaPage {
                     }
                 }
                 ]
-            });
-            alert.present();
+            }).present();
             }
         },{
             text: 'Voltar',
+            icon: 'ios-close',
             role: 'cancel',
             handler: () => {
             }
@@ -227,31 +227,29 @@ export class MapaPage {
     }
 
     verificarPedido(){
-        let listDB = this.db.database.ref('pedidos').child(this.uid);
-        
-            listDB.on('value', (snapshot) => {
-                let info = snapshot.val();
-                
-                if(info == null){
-                    let alert = this.alertCtrl.create({
-                        title: 'Usuario cancelou a corrida',
-                        cssClass: 'alertDanger',
-                        buttons: [
-                            {
-                                text: 'Voltar',
-                                handler: () => {
-                                    this.navCtrl.pop();
-                                }
+        this.db.database.ref('pedidos').child(this.uid).on('value', (snapshot) => {
+            let info = snapshot.val();
+            
+            if(info == null){
+                let alert = this.alertCtrl.create({
+                    title: 'Usuario cancelou a corrida',
+                    cssClass: 'alertDanger',
+                    buttons: [
+                        {
+                            text: 'Voltar',
+                            handler: () => {
+                                this.navCtrl.pop();
                             }
-                        ]
-                    });
-                    alert.present();
-                }
+                        }
+                    ]
+                });
+                alert.present();
+            }
         });
     }
 
     corridaFinalizada(){
-        let alert = this.alertCtrl.create({
+        this.alertCtrl.create({
             title: 'Otimo',
             message:'Agora o usuario ira avaliar a corrida para ser realmente finalizada',
             cssClass: 'alertDanger',
@@ -263,10 +261,8 @@ export class MapaPage {
                     }
                 }
             ]
-        });
-        alert.present();
-        let userDB = this.db.database.ref('pedidos').child(this.uid);
-        userDB.update(
+        }).present();
+        this.db.database.ref('pedidos').child(this.uid).update(
             {
                 status: "finalizado"
             }

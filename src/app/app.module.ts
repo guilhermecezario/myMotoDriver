@@ -10,17 +10,14 @@ import { MapaPage } from '../pages/mapa/mapa';
 import { LoginPageModule } from '../pages/login/login.module'
 
 //plugins
-import { Network } from  '@ionic-native/network';
 import { MyApp } from './app.component';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule} from 'angularfire2/auth';
 import { FIREBASE_CONFIG } from './app.firebase.config';
-import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { GoogleMaps } from '@ionic-native/google-maps';
 
 import { Camera } from '@ionic-native/camera';
-import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { Geolocation } from '@ionic-native/geolocation';
 
 @NgModule({
@@ -45,13 +42,10 @@ import { Geolocation } from '@ionic-native/geolocation';
     MapaPage
   ],
   providers: [
-    ImagePicker,
     Camera,
     GoogleMaps,
     StatusBar,
-    NativeGeocoder,
     Geolocation,
-    Network,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
