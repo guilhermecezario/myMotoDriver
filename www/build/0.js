@@ -1,6 +1,6 @@
 webpackJsonp([0],{
 
-/***/ 841:
+/***/ 842:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -27,7 +27,7 @@ var RegisterPageModule = /** @class */ (function () {
                 __WEBPACK_IMPORTED_MODULE_2__register__["a" /* RegisterPage */],
             ],
             imports: [
-                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__register__["a" /* RegisterPage */]),
+                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__register__["a" /* RegisterPage */]),
             ],
         })
     ], RegisterPageModule);
@@ -245,14 +245,14 @@ var RegisterPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-register',template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/register/register.html"*/'<ion-content class="background" >\n  <!-- Dados da moto -->\n  <div class="centerContent" *ngIf="registerMoto">\n    <img src="./assets/imgs/logo.png" class="logo">\n\n    <div class="buttonBack">\n      <p>Moto</p>\n    </div>\n      <input type="text" [(ngModel)]="cor" placeholder="Cor da moto" class="input">\n      <input type="text" [(ngModel)]="placa" placeholder="Numero da Placa" class="input">\n    <div class="buttonNext" (click)="detalhesMoto()">\n      Proximo\n    </div>\n    <div class="buttonBack" (click)="abrirLogin()">\n      Voltar para login\n    </div>\n  </div>\n\n  <!-- Foto da CNH -->\n  <div class="centerContent" *ngIf="registerCnh">\n    <img src="./assets/imgs/camera.svg" class="image">\n    <div class="text-1">\n      Tire uma foto da sua CNH\n    </div>\n    <div class="text-2">\n      Para nós ajudar e agilizamos o processo de verificação,\n      retire a do plastico abra e tire a foto em um local bem iluminado\n    </div>\n    <div class="buttonNext" (click)="buscarImagem()" *ngIf="buscarImg">\n        Buscar foto\n      </div>\n      <div class="buttonNext" (click)="abrirInfoUser()" *ngIf="continuar">\n          Continuar\n        </div>\n      <div class="buttonBack" (click)="abrirLogin()">\n        Voltar Login\n      </div>\n  </div>\n\n  <!-- dados pessoais -->\n  <div class="centerContent" *ngIf="registerUser">\n    <img src="./assets/imgs/logo.png" class="logo">\n    <div class="buttonBack">\n      Dados pessoais\n    </div>\n    <input type="text" [(ngModel)]="nome" placeholder="Nome" class="input">\n    <input type="text" [(ngModel)]="user.email" placeholder="E-mail" class="input">\n    <input type="password" [(ngModel)]="user.password" placeholder="Senha" class="input">\n    <input type="password" [(ngModel)]="confirm_pass" placeholder="Confirmação de senha" class="input">\n    \n    <div (click)="register(user)" class="buttonNext">\n      Confirmar\n    </div>\n    <div (click)="abrirLogin()" class="buttonBack">\n      Voltar para login\n    </div>\n  </div>\n\n  <!-- tela final -->\n  <div class="centerContent" *ngIf="final">\n    <img src="./assets/imgs/feito.svg" class="image">\n\n    <p class="text-1">Tudo pronto</p>\n\n    <p class="text-2">Agora que você fez a sua parte, os nossos administradores irão verificar sua situação e te mandaram um email autorizando o seu acesso. Aguarde...</p>\n    \n    <div class="buttonNext" (click)="abrirLogin()">\n      Ok\n    </div>\n  </div>\n</ion-content>\n'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/register/register.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ToastController */],
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */],
             __WEBPACK_IMPORTED_MODULE_2_angularfire2_auth__["AngularFireAuth"],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
             __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"],
             __WEBPACK_IMPORTED_MODULE_4__ionic_native_camera__["a" /* Camera */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */]])
     ], RegisterPage);
     return RegisterPage;
 }());

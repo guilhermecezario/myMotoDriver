@@ -1,0 +1,60 @@
+page-map {  
+  ion-content{
+    overflow-y: hidden;
+  }
+  .botao{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 10%;
+    font-size:25px;
+    background: #292838;
+    width: 100%;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    color: #FFF;
+    position: absolute;
+    bottom: 0;
+  }
+  .map{
+    width: 100%;
+    height: 100%;
+  }
+  .opcoes{
+    bottom: 0;
+    width: 100%;
+    height: 35%;
+    position: absolute;
+    background-color: rgba($color: #292838, $alpha: 0.95);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    .title{
+      color: #FFF;
+      text-align: center;
+      font-weight: 500;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .buttonConfirm{
+      background-color: rgb(52, 255, 103);
+    }
+    .buttonCancel{
+      background-color: rgb(253, 86, 106);
+    }
+    .buttonBack{
+      text-decoration: underline;
+      margin-top: 10px;
+    }
+  }
+  .buttonTamplate{
+    color: #FFF;
+    margin-top: 10px;
+    padding: 8px;
+    margin-left: 15px;
+    margin-right: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 500;
+  }
+}

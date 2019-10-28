@@ -9,7 +9,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Pedido } from '../../classes/pedido';
 
 //Paginas
-import { MapaPage } from '../mapa/mapa';
+import { MapPage } from '../map/map';
 import { PerfilPage } from '../perfil/perfil';
 
 @IonicPage()
@@ -43,6 +43,7 @@ export class HomePage {
   }
 
   ionViewWillEnter() {
+    console.log("home");
     this.buscarDados();
   }
 
@@ -76,20 +77,16 @@ export class HomePage {
         });
       }
       else if(dados.motorista == this.uid && dados.status == ""){
-        this.navCtrl.push(MapaPage, {
-          id: item.key,
-          id_motorista: this.uid,
-          estado: '1'
-        });
+        this.abrirMapa(item.key);
       }
       })
     });
   }
   abrirMapa(id: string){
-    this.navCtrl.push(MapaPage,{
+    this.navCtrl.setRoot(MapPage,{
       id: id,
       id_motorista: this.uid,
-      estado: '0'
+      pedidoPendente: false
     });
   }
 

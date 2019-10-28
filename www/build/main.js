@@ -184,13 +184,13 @@ var LoginPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-login',template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/login/login.html"*/'<ion-content class="content">\n  <!-- <div class="align-input">\n    <div class="center">\n        <img src="./assets/imgs/logo.png" class="logo">\n      </div>\n      <div class="center margin-top-20">\n        <div class="background-input">\n          <ion-input type="text" [(ngModel)]="user.email" placeholder="E-mail" class="input"></ion-input>\n        </div>\n        <div class="background-input">\n          <ion-input type="password" [(ngModel)]="user.password" placeholder="Senha" class="input"></ion-input>\n        </div>\n        <div class="senha center mg-top-20" (click)="esqueceuSenha()">\n          Esqueceu sua senha?\n        </div>\n        </div>\n    \n        <div (click)="login(user)" class="center botao bold mg-top-20">\n      Entrar\n    </div>\n    <div (click)="register()" class="center bold white mg-top-20 font-18">\n      Cadastrar\n    </div>\n  </div> -->\n  <div class="centerContent">\n    <div>\n      <img src="../../assets/imgs/logo.png" class="logo">\n    </div>\n\n    <input type="email" placeholder="E-mail" [(ngModel)]="user.email" class="input">\n    <input type="password" placeholder="senha" [(ngModel)]="user.password" class="input">\n\n    <div class="forgotPassword" (click)="esqueceuSenha()">\n      <p>Esqueceu a senha?</p>\n    </div>\n    <div class="buttonEnter" (click)="login(user)">\n      Entrar\n    </div>\n    <div class="register" (click)="register()">\n      Cadastrar\n    </div>\n  </div>\n</ion-content>'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/login/login.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */],
             __WEBPACK_IMPORTED_MODULE_2_angularfire2_auth__["AngularFireAuth"],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */],
             __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ToastController */]])
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */]])
     ], LoginPage);
     return LoginPage;
 }());
@@ -203,7 +203,7 @@ var LoginPage = /** @class */ (function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MapaPage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MapPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_geolocation__ = __webpack_require__(374);
@@ -224,37 +224,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var MapaPage = /** @class */ (function () {
-    function MapaPage(geolocation, navParams, db, actionSheetCtrl, navCtrl, alertCtrl, toastCtrl) {
+var MapPage = /** @class */ (function () {
+    function MapPage(geolocation, navParams, db, navCtrl, alertCtrl, toastCtrl) {
         this.geolocation = geolocation;
         this.navParams = navParams;
         this.db = db;
-        this.actionSheetCtrl = actionSheetCtrl;
         this.navCtrl = navCtrl;
         this.alertCtrl = alertCtrl;
         this.toastCtrl = toastCtrl;
-        this.pedido = true;
         this.final = false;
-        this.directionsService = new google.maps.DirectionsService();
-        this.directionsDisplay = new google.maps.DirectionsRenderer({ polylineOptions: {
-                strokeColor: "#292838",
-                strokeOpacity: 0.8,
-                strokeWeight: 8,
-            } });
-        this.uid = navParams.get('id');
-        this.id_motorista = navParams.get('id_motorista');
-        this.estado = navParams.get('estado');
     }
-    MapaPage.prototype.ionViewDidLoad = function () {
+    MapPage.prototype.ionViewDidEnter = function () {
+        console.log('mapa');
+        this.uid = this.navParams.get('id');
+        this.id_motorista = this.navParams.get('id_motorista');
+        this.initializeMap();
         this.pegarDados();
     };
-    MapaPage.prototype.pegarDados = function () {
+    MapPage.prototype.pegarDados = function () {
         var _this = this;
         this.db.database.ref('pedidos').child(this.uid).once('value', function (snapshot) {
             var info = snapshot.val();
-            if (info != undefined) {
-                if (_this.estado == '1') {
-                    _this.pedido = false;
+            if (info != null) {
+                _this.todasInfoCliente = info;
+                if (info.motorista == _this.id_motorista) {
                     _this.final = true;
                 }
                 _this.usuarioPosition = info.origemLat + ", " + info.origemLng;
@@ -262,212 +255,239 @@ var MapaPage = /** @class */ (function () {
                 _this.pegarLocalizacao();
             }
             else {
-                _this.toastCtrl.create({
-                    message: 'Esse pedido não existe mais',
-                    duration: 4000
+                _this.alertCtrl.create({
+                    title: 'Usuario cancelou a corrida',
+                    cssClass: 'alertDanger',
+                    buttons: [{
+                            text: 'Voltar',
+                            handler: function () {
+                                _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
+                            }
+                        }]
                 }).present();
-                _this.navCtrl.pop();
             }
         });
     };
-    MapaPage.prototype.pegarLocalizacao = function () {
+    MapPage.prototype.pegarLocalizacao = function () {
         var _this = this;
         this.geolocation.getCurrentPosition().then(function (resp) {
             _this.startPosition = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
-            _this.initializeMap();
+            _this.traceRoute(_this.directionsDisplay);
             console.log("Posição atual: " + resp.coords.latitude, resp.coords.longitude);
         }).catch(function (error) {
             _this.toastCtrl.create({
                 message: 'Ops deu algum erro com seu GPS',
                 duration: 4000
             }).present();
-            _this.navCtrl.pop();
+            _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
         });
     };
-    MapaPage.prototype.initializeMap = function () {
+    MapPage.prototype.initializeMap = function () {
+        this.directionsService = new google.maps.DirectionsService();
+        this.directionsDisplay = new google.maps.DirectionsRenderer({
+            polylineOptions: {
+                strokeColor: "#292838",
+                strokeOpacity: 1,
+                strokeWeight: 5,
+            }
+        });
+        var centerMap = new google.maps.LatLng(-23.9793, -48.8769);
         var mapOptions = {
             zoom: 18,
-            center: this.startPosition,
+            center: centerMap,
             disableDefaultUI: true
         };
         this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
         this.directionsDisplay.setMap(this.map);
+    };
+    MapPage.prototype.traceRoute = function (display) {
         var request = {
             // Pode ser uma coordenada (LatLng), uma string ou um lugar
             origin: this.startPosition,
             destination: this.destinoPosition,
-            waypoints: [{ location: this.usuarioPosition }],
+            waypoints: [{
+                    location: this.usuarioPosition
+                }],
             travelMode: 'DRIVING'
         };
-        this.traceRoute(this.directionsService, this.directionsDisplay, request);
-    };
-    MapaPage.prototype.traceRoute = function (service, display, request) {
-        service.route(request, function (result, status) {
+        this.directionsService.route(request, function (result, status) {
             if (status == 'OK') {
                 display.setDirections(result);
             }
         });
     };
-    MapaPage.prototype.opcoesPedido = function () {
-        var _this = this;
-        var actionSheet = this.actionSheetCtrl.create({
-            title: 'Aceitar corrida',
-            cssClass: 'action-sheets-groups-page',
-            buttons: [
-                {
-                    text: 'Aceitar',
-                    role: 'destructive',
-                    icon: 'open',
-                    handler: function () {
-                        _this.aceitarPedidos();
-                        _this.pedido = false;
-                        _this.final = true;
-                    }
-                }, {
-                    text: 'Cancelar',
-                    icon: 'ios-close',
-                    handler: function () {
-                        _this.navCtrl.pop();
-                    }
-                }
-            ]
-        });
-        actionSheet.present();
+    MapPage.prototype.opcoes = function () {
+        if (this.final == false) {
+            this.abrirOpcoesIniciais();
+        }
+        else {
+            this.abrirOpcoesFinais();
+        }
     };
-    MapaPage.prototype.opcoesFinal = function () {
+    MapPage.prototype.abrirOpcoesIniciais = function () {
+        console.log("abriu opções iniciais");
+        var opcoes = -35;
+        var botao = 0;
+        var interval = setInterval(function () {
+            if (opcoes <= 0) {
+                document.getElementById('opcoesIniciais').style.display = "flex";
+                document.getElementById('opcoesIniciais').style.bottom = opcoes + "%";
+                document.getElementById('botao').style.bottom = botao + "%";
+                opcoes++;
+                botao++;
+            }
+            else {
+                clearInterval(interval);
+            }
+        }, 8);
+    };
+    MapPage.prototype.abrirOpcoesFinais = function () {
+        console.log("abriu opções finais");
+        var opcoes = -35;
+        var botao = 0;
+        var interval = setInterval(function () {
+            if (opcoes <= 0) {
+                document.getElementById('opcoesFinais').style.display = "flex";
+                document.getElementById('opcoesFinais').style.bottom = opcoes + "%";
+                document.getElementById('botao').style.bottom = botao + "%";
+                opcoes++;
+                botao++;
+            }
+            else {
+                clearInterval(interval);
+            }
+        }, 8);
+    };
+    MapPage.prototype.fecharOpcoesIniciais = function () {
+        var opcoes = 0;
+        var botao = 35;
+        document.getElementById('opcoesIniciais').style.display = "flex";
+        var intervalInicio = setInterval(function () {
+            if (opcoes >= -35) {
+                document.getElementById('opcoesIniciais').style.bottom = opcoes + "%";
+                document.getElementById('botao').style.bottom = botao + "%";
+                opcoes--;
+                botao--;
+            }
+            else {
+                document.getElementById('opcoesIniciais').style.display = "none";
+                clearInterval(intervalInicio);
+            }
+        }, 8);
+    };
+    MapPage.prototype.fecharOpcoesFinais = function () {
+        var opcoes = 0;
+        var botao = 35;
+        document.getElementById('opcoesFinais').style.display = "flex";
+        var intervalFinal = setInterval(function () {
+            if (opcoes >= -35) {
+                document.getElementById('opcoesFinais').style.bottom = opcoes + "%";
+                document.getElementById('botao').style.bottom = botao + "%";
+                opcoes--;
+                botao--;
+            }
+            else {
+                document.getElementById('opcoesFinais').style.display = "none";
+                clearInterval(intervalFinal);
+            }
+        }, 8);
+    };
+    MapPage.prototype.voltarHome = function () {
+        this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
+    };
+    MapPage.prototype.aceitarPedido = function () {
         var _this = this;
-        var actionSheet = this.actionSheetCtrl.create({
-            title: 'Opções',
-            buttons: [
-                {
-                    text: 'Corrida finalizada',
-                    icon: 'ios-checkmark',
-                    role: 'destructive',
+        this.todasInfoCliente.motorista = this.id_motorista;
+        console.log("entrou na função aceitar");
+        this.db.database.ref('pedidos').child(this.uid).set(this.todasInfoCliente).then(function (data) {
+            console.log("foi");
+            _this.verificarPedido();
+        });
+    };
+    MapPage.prototype.cancelarPedido = function () {
+        var _this = this;
+        this.alertCtrl.create({
+            title: 'Deseja cancelar essa corrida?',
+            buttons: [{
+                    text: 'Sim',
                     handler: function () {
-                        _this.alertCtrl.create({
-                            title: 'Essa corrida foi finalizada?',
-                            buttons: [
-                                {
-                                    text: 'Sim',
-                                    handler: function () {
-                                        _this.corridaFinalizada();
-                                    }
-                                },
-                                {
-                                    text: 'Não',
-                                    handler: function () {
-                                    }
-                                }
-                            ]
-                        }).present();
+                        _this.db.database.ref('pedidos').child(_this.uid).update({
+                            motorista: ""
+                        });
+                        _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
                     }
                 },
                 {
-                    text: 'Cancelar corrida',
-                    icon: 'ios-undo',
-                    role: 'destructive',
+                    text: 'Voltar',
+                    handler: function () { }
+                }
+            ]
+        }).present();
+    };
+    MapPage.prototype.verificarPedido = function () {
+        var _this = this;
+        this.db.database.ref('pedidos').child(this.uid).on('value', function (snapshot) {
+            if (snapshot.val() == null) {
+                _this.alertCtrl.create({
+                    title: 'Usuario cancelou a corrida',
+                    cssClass: 'alertDanger',
+                    buttons: [{
+                            text: 'Voltar',
+                            handler: function () {
+                                _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
+                            }
+                        }]
+                }).present();
+            }
+        });
+    };
+    MapPage.prototype.corridaFinalizada = function () {
+        var _this = this;
+        this.alertCtrl.create({
+            title: 'Essa corrida foi finalizada?',
+            buttons: [{
+                    text: 'Sim',
                     handler: function () {
                         _this.alertCtrl.create({
-                            title: 'Deseja cancelar essa corrida?',
+                            title: 'Otimo',
+                            message: 'Agora o usuario ira avaliar a corrida para ser realmente finalizada',
+                            cssClass: 'alertDanger',
                             buttons: [
                                 {
-                                    text: 'Sim',
+                                    text: 'Ok',
                                     handler: function () {
-                                        _this.cancelarPedido();
-                                        _this.navCtrl.pop();
-                                    }
-                                },
-                                {
-                                    text: 'Voltar',
-                                    handler: function () {
+                                        _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
                                     }
                                 }
                             ]
                         }).present();
+                        _this.db.database.ref('pedidos').child(_this.uid).update({
+                            status: "finalizado"
+                        });
                     }
-                }, {
-                    text: 'Voltar',
-                    icon: 'ios-close',
-                    role: 'cancel',
-                    handler: function () {
-                    }
-                }
-            ]
-        });
-        actionSheet.present();
-    };
-    MapaPage.prototype.aceitarPedidos = function () {
-        var listDB = this.db.database.ref('pedidos').child(this.uid);
-        listDB.update({
-            motorista: this.id_motorista
-        });
-    };
-    MapaPage.prototype.cancelarPedido = function () {
-        var listDB = this.db.database.ref('pedidos').child(this.uid);
-        listDB.update({
-            motorista: ""
-        });
-    };
-    MapaPage.prototype.verificarPedido = function () {
-        var _this = this;
-        this.db.database.ref('pedidos').child(this.uid).on('value', function (snapshot) {
-            var info = snapshot.val();
-            if (info == null) {
-                var alert_1 = _this.alertCtrl.create({
-                    title: 'Usuario cancelou a corrida',
-                    cssClass: 'alertDanger',
-                    buttons: [
-                        {
-                            text: 'Voltar',
-                            handler: function () {
-                                _this.navCtrl.pop();
-                            }
-                        }
-                    ]
-                });
-                alert_1.present();
-            }
-        });
-    };
-    MapaPage.prototype.corridaFinalizada = function () {
-        var _this = this;
-        this.alertCtrl.create({
-            title: 'Otimo',
-            message: 'Agora o usuario ira avaliar a corrida para ser realmente finalizada',
-            cssClass: 'alertDanger',
-            buttons: [
+                },
                 {
-                    text: 'Ok',
-                    handler: function () {
-                        _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_4__home_home__["a" /* HomePage */]);
-                    }
+                    text: 'Não',
+                    handler: function () { }
                 }
             ]
         }).present();
-        this.db.database.ref('pedidos').child(this.uid).update({
-            status: "finalizado"
-        });
     };
     __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])('map'),
-        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* ElementRef */])
-    ], MapaPage.prototype, "mapElement", void 0);
-    MapaPage = __decorate([
+        __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* ElementRef */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["t" /* ElementRef */]) === "function" && _a || Object)
+    ], MapPage.prototype, "mapElement", void 0);
+    MapPage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-mapa',template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/mapa/mapa.html"*/'<ion-content>\n  <div #map id="map"></div>\n  <div id="botao" (click)="opcoesPedido();" *ngIf="pedido">\n      Opções\n  </div>\n  <div id="botao" (click)="opcoesFinal();" *ngIf="final">\n    Opções\n</div>\n</ion-content>'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/mapa/mapa.html"*/,
+            selector: 'page-map',template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/map/map.html"*/'<ion-content>\n  <div #map class="map"></div>\n  <div class="botao" id="botao" (click)="opcoes();">\n    Opções\n  </div>\n\n  <div class="opcoes" id="opcoesIniciais">\n    <div class="title">\n      Aceita a corrida?\n    </div>\n    <div class="buttonConfirm buttonTamplate" (click)="aceitarPedido()">\n      Aceitar\n    </div>\n    <div class="buttonCancel buttonTamplate" (click)="voltarHome()">\n      Não aceitar\n    </div>\n    <div class="buttonBack buttonTamplate" (click)="fecharOpcoesIniciais()">\n      voltar\n    </div>\n  </div>\n\n  <div class="opcoes" id="opcoesFinais">\n    <div class="title">\n      Corrida em andamento\n    </div>\n    <div class="buttonConfirm buttonTamplate" (click)="corridaFinalizada()">\n      Corrida finalida\n    </div>\n    <div class="buttonCancel buttonTamplate" (click)="cancelarPedido()">\n      Cancelar corrida\n    </div>\n    <div class="buttonBack buttonTamplate" (click)="fecharOpcoesFinais()">\n      voltar\n    </div>\n  </div>\n</ion-content>'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/map/map.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__ionic_native_geolocation__["a" /* Geolocation */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
-            __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* ActionSheetController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ToastController */]])
-    ], MapaPage);
-    return MapaPage;
+        __metadata("design:paramtypes", [typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__ionic_native_geolocation__["a" /* Geolocation */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__ionic_native_geolocation__["a" /* Geolocation */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */]) === "function" && _g || Object])
+    ], MapPage);
+    return MapPage;
+    var _a, _b, _c, _d, _e, _f, _g;
 }());
 
-//# sourceMappingURL=mapa.js.map
+//# sourceMappingURL=map.js.map
 
 /***/ }),
 
@@ -573,12 +593,12 @@ var PerfilPage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-perfil',template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/perfil/perfil.html"*/'<ion-content>\n<div>\n  <div class="containerHeader" id="container">\n    <div class="botao-perfil">\n      <ion-icon name="arrow-round-back" class="botao-voltar" (click)="abrirHome()"></ion-icon>\n      <ion-icon name="create" class="botao-editar" (click)="mudarPerfil()"></ion-icon>\n    </div>\n    <div id="imagem">\n    </div>\n    <div id="textos">\n      <p id="nome"></p>\n      <div>\n        <div class="displayFlex">\n          <p id="avaliacao"></p>\n          <ion-icon ios="ios-star" md="md-star"></ion-icon>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class="boxInfo">\n    <div class="textInfo">\n      <h2>Informaçoes da moto</h2>\n      <div class="displayFlex">\n        <p class="boldFont">Cor:</p>\n        <p id="cor"></p>\n      </div>\n      <div class="displayFlex">\n        <p class="boldFont">Placa:</p>\n        <p id="placa"></p>\n      </div>\n    </div>\n  </div>\n  <div class="boxCorrida">\n    <div class="textCorrida">\n      <h2>Corridas realizadas</h2>\n      <div>\n        <p id="corridas"></p>\n      </div>\n    </div>\n  </div>\n  <div class="containerBody">\n  </div>\n</div>\n</ion-content>\n'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/perfil/perfil.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */],
             __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["AngularFireDatabase"],
             __WEBPACK_IMPORTED_MODULE_3__ionic_native_camera__["a" /* Camera */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ToastController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* LoadingController */]])
     ], PerfilPage);
     return PerfilPage;
 }());
@@ -615,16 +635,16 @@ var map = {
 	"../pages/login/login.module": [
 		376
 	],
-	"../pages/mapa/mapa.module": [
+	"../pages/map/map.module": [
 		840,
 		2
 	],
 	"../pages/perfil/perfil.module": [
-		842,
+		841,
 		1
 	],
 	"../pages/register/register.module": [
-		841,
+		842,
 		0
 	]
 };
@@ -671,7 +691,7 @@ var LoginPageModule = /** @class */ (function () {
                 __WEBPACK_IMPORTED_MODULE_2__login__["a" /* LoginPage */],
             ],
             imports: [
-                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__login__["a" /* LoginPage */]),
+                __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__login__["a" /* LoginPage */]),
             ],
         })
     ], LoginPageModule);
@@ -694,7 +714,7 @@ var LoginPageModule = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__ = __webpack_require__(59);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_angularfire2_database___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_angularfire2_database__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__classes_pedido__ = __webpack_require__(814);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__mapa_mapa__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__map_map__ = __webpack_require__(201);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__perfil_perfil__ = __webpack_require__(202);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -731,6 +751,7 @@ var HomePage = /** @class */ (function () {
         this.reload = true;
     }
     HomePage.prototype.ionViewWillEnter = function () {
+        console.log("home");
         this.buscarDados();
     };
     HomePage.prototype.buscarDados = function () {
@@ -766,20 +787,16 @@ var HomePage = /** @class */ (function () {
                     });
                 }
                 else if (dados.motorista == _this.uid && dados.status == "") {
-                    _this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_5__mapa_mapa__["a" /* MapaPage */], {
-                        id: item.key,
-                        id_motorista: _this.uid,
-                        estado: '1'
-                    });
+                    _this.abrirMapa(item.key);
                 }
             });
         });
     };
     HomePage.prototype.abrirMapa = function (id) {
-        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_5__mapa_mapa__["a" /* MapaPage */], {
+        this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_5__map_map__["a" /* MapPage */], {
             id: id,
             id_motorista: this.uid,
-            estado: '0'
+            pedidoPendente: false
         });
     };
     HomePage.prototype.logout = function () {
@@ -808,14 +825,10 @@ var HomePage = /** @class */ (function () {
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-home',template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/home/home.html"*/'<ion-menu [content]="content" class="ContentMenu">\n    <ion-header class="HeaderMenu" *ngIf="userDate">\n      <ion-toolbar>\n        <div>\n          <img [src]="userDate.perfil">\n        </div>\n        <div>\n          <p>{{userDate.nome}}</p>\n        </div>\n        <div class="buttonMenu" (click)="abrirPerfil()">\n          <ion-icon name="contact"></ion-icon>\n          Ver perfil\n        </div>\n      </ion-toolbar>\n    </ion-header>\n      <ion-content>\n        <button ion-item (click)= "logout()" menuClose class="buttonListMenu">          \n          Sair\n        </button>\n      </ion-content>\n    </ion-menu>\n    <ion-nav id="nav" #content [root]="rootPage"></ion-nav>\n\n    <ion-header>\n      <ion-navbar>\n        <button ion-button menuToggle [disabled]="userDate == undefined">\n          <ion-icon name=\'menu\'></ion-icon>\n        </button>\n        <ion-title>Pedidos</ion-title>\n      </ion-navbar>\n    </ion-header>\n\n<ion-content class="content">\n  <ion-refresher (ionRefresh)="doRefresh($event)">\n    <ion-refresher-content></ion-refresher-content>\n  </ion-refresher>\n    <div *ngIf="pedidos.length > 0 && reload == false" class="list">\n      <ion-list *ngFor="let p of pedidos">\n        <ion-item (click)="abrirMapa(p.getId())" class="list-pedido">\n          <div class="list-nome">Nome: {{p.getUsuario()}}</div>\n          <div class="list-preco">Preço: {{p.getPreco()}}</div>\n        </ion-item>\n      </ion-list>\n    </div>\n    <div class="centerText" *ngIf="reload">\n      <p>Carregando...</p>\n    </div>\n    <div class="centerText" *ngIf="pedidos.length == 0 && reload == false">\n      <div>\n        Deslize para buscar mais\n      </div>\n      <div>\n        <ion-icon ios="ios-arrow-down" md="md-arrow-down"></ion-icon>\n      </div>\n    </div>\n</ion-content>\n'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/pages/home/home.html"*/,
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
-            __WEBPACK_IMPORTED_MODULE_2_angularfire2_auth__["AngularFireAuth"],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ToastController */],
-            __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"],
-            __WEBPACK_IMPORTED_MODULE_0__angular_core__["M" /* NgZone */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_auth__["AngularFireAuth"] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_auth__["AngularFireAuth"]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["AngularFireDatabase"]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["M" /* NgZone */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["M" /* NgZone */]) === "function" && _f || Object])
     ], HomePage);
     return HomePage;
+    var _a, _b, _c, _d, _e, _f;
 }());
 
 //# sourceMappingURL=home.js.map
@@ -847,7 +860,7 @@ Object(__WEBPACK_IMPORTED_MODULE_0__angular_platform_browser_dynamic__["a" /* pl
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_status_bar__ = __webpack_require__(416);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_login_login__ = __webpack_require__(179);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__pages_perfil_perfil__ = __webpack_require__(202);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pages_mapa_mapa__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pages_map_map__ = __webpack_require__(201);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pages_login_login_module__ = __webpack_require__(376);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_component__ = __webpack_require__(835);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9_angularfire2__ = __webpack_require__(836);
@@ -892,17 +905,17 @@ var AppModule = /** @class */ (function () {
             declarations: [
                 __WEBPACK_IMPORTED_MODULE_8__app_component__["a" /* MyApp */],
                 __WEBPACK_IMPORTED_MODULE_5__pages_perfil_perfil__["a" /* PerfilPage */],
-                __WEBPACK_IMPORTED_MODULE_6__pages_mapa_mapa__["a" /* MapaPage */]
+                __WEBPACK_IMPORTED_MODULE_6__pages_map_map__["a" /* MapPage */]
             ],
             imports: [
                 __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
-                __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["e" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_8__app_component__["a" /* MyApp */], {}, {
+                __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["d" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_8__app_component__["a" /* MyApp */], {}, {
                     links: [
                         { loadChildren: '../pages/home/home.module#HomePageModule', name: 'HomePage', segment: 'home', priority: 'low', defaultHistory: [] },
-                        { loadChildren: '../pages/mapa/mapa.module#MapaPageModule', name: 'MapaPage', segment: 'mapa', priority: 'low', defaultHistory: [] },
                         { loadChildren: '../pages/login/login.module#LoginPageModule', name: 'LoginPage', segment: 'login', priority: 'low', defaultHistory: [] },
-                        { loadChildren: '../pages/register/register.module#RegisterPageModule', name: 'RegisterPage', segment: 'register', priority: 'low', defaultHistory: [] },
-                        { loadChildren: '../pages/perfil/perfil.module#PerfilPageModule', name: 'PerfilPage', segment: 'perfil', priority: 'low', defaultHistory: [] }
+                        { loadChildren: '../pages/map/map.module#MapPageModule', name: 'MapPage', segment: 'map', priority: 'low', defaultHistory: [] },
+                        { loadChildren: '../pages/perfil/perfil.module#PerfilPageModule', name: 'PerfilPage', segment: 'perfil', priority: 'low', defaultHistory: [] },
+                        { loadChildren: '../pages/register/register.module#RegisterPageModule', name: 'RegisterPage', segment: 'register', priority: 'low', defaultHistory: [] }
                     ]
                 }),
                 __WEBPACK_IMPORTED_MODULE_9_angularfire2__["AngularFireModule"].initializeApp(__WEBPACK_IMPORTED_MODULE_12__app_firebase_config__["a" /* FIREBASE_CONFIG */]),
@@ -910,19 +923,19 @@ var AppModule = /** @class */ (function () {
                 __WEBPACK_IMPORTED_MODULE_10_angularfire2_database__["AngularFireDatabaseModule"],
                 __WEBPACK_IMPORTED_MODULE_7__pages_login_login_module__["LoginPageModule"]
             ],
-            bootstrap: [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["c" /* IonicApp */]],
+            bootstrap: [__WEBPACK_IMPORTED_MODULE_2_ionic_angular__["b" /* IonicApp */]],
             entryComponents: [
                 __WEBPACK_IMPORTED_MODULE_8__app_component__["a" /* MyApp */],
                 __WEBPACK_IMPORTED_MODULE_4__pages_login_login__["a" /* LoginPage */],
                 __WEBPACK_IMPORTED_MODULE_5__pages_perfil_perfil__["a" /* PerfilPage */],
-                __WEBPACK_IMPORTED_MODULE_6__pages_mapa_mapa__["a" /* MapaPage */]
+                __WEBPACK_IMPORTED_MODULE_6__pages_map_map__["a" /* MapPage */]
             ],
             providers: [
                 __WEBPACK_IMPORTED_MODULE_14__ionic_native_camera__["a" /* Camera */],
                 __WEBPACK_IMPORTED_MODULE_13__ionic_native_google_maps__["a" /* GoogleMaps */],
                 __WEBPACK_IMPORTED_MODULE_3__ionic_native_status_bar__["a" /* StatusBar */],
                 __WEBPACK_IMPORTED_MODULE_15__ionic_native_geolocation__["a" /* Geolocation */],
-                { provide: __WEBPACK_IMPORTED_MODULE_1__angular_core__["u" /* ErrorHandler */], useClass: __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["d" /* IonicErrorHandler */] }
+                { provide: __WEBPACK_IMPORTED_MODULE_1__angular_core__["u" /* ErrorHandler */], useClass: __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["c" /* IonicErrorHandler */] }
             ]
         })
     ], AppModule);
@@ -1003,7 +1016,7 @@ var MyApp = /** @class */ (function () {
     MyApp = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"/opt/lampp/htdocs/TCC/app_motorista/src/app/app.html"*/'<ion-nav [root]="rootPage"></ion-nav>\n'/*ion-inline-end:"/opt/lampp/htdocs/TCC/app_motorista/src/app/app.html"*/
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */]])
     ], MyApp);
     return MyApp;
 }());

@@ -6,7 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 //pages
 import { LoginPage } from '../pages/login/login';
 import { PerfilPage } from '../pages/perfil/perfil';
-import { MapaPage } from '../pages/mapa/mapa';
+import { MapPage } from '../pages/map/map';
 import { LoginPageModule } from '../pages/login/login.module'
 
 //plugins
@@ -24,7 +24,7 @@ import { Geolocation } from '@ionic-native/geolocation';
   declarations: [
     MyApp,
     PerfilPage,
-    MapaPage
+    MapPage
   ],
   imports: [
     BrowserModule,
@@ -39,7 +39,7 @@ import { Geolocation } from '@ionic-native/geolocation';
     MyApp,
     LoginPage,
     PerfilPage,
-    MapaPage
+    MapPage
   ],
   providers: [
     Camera,

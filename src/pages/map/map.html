@@ -1,0 +1,36 @@
+<ion-content>
+  <div #map class="map"></div>
+  <div class="botao" id="botao" (click)="opcoes();">
+    Opções
+  </div>
+
+  <div class="opcoes" id="opcoesIniciais">
+    <div class="title">
+      Aceita a corrida?
+    </div>
+    <div class="buttonConfirm buttonTamplate" (click)="aceitarPedido()">
+      Aceitar
+    </div>
+    <div class="buttonCancel buttonTamplate" (click)="voltarHome()">
+      Não aceitar
+    </div>
+    <div class="buttonBack buttonTamplate" (click)="fecharOpcoesIniciais()">
+      voltar
+    </div>
+  </div>
+
+  <div class="opcoes" id="opcoesFinais">
+    <div class="title">
+      Corrida em andamento
+    </div>
+    <div class="buttonConfirm buttonTamplate" (click)="corridaFinalizada()">
+      Corrida finalida
+    </div>
+    <div class="buttonCancel buttonTamplate" (click)="cancelarPedido()">
+      Cancelar corrida
+    </div>
+    <div class="buttonBack buttonTamplate" (click)="fecharOpcoesFinais()">
+      voltar
+    </div>
+  </div>
+</ion-content>
