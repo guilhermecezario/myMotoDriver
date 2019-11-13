@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { IonicPage, NavParams, NavController, AlertController, ToastController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, snapshotChanges } from 'angularfire2/database';
 import { HomePage } from '../home/home';
 
 declare var google: any;
@@ -13,6 +13,8 @@ declare var google: any;
 })
 export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
+  @ViewChild('opcoesIniciais') opcoesIniciais: ElementRef;
+  @ViewChild('opcoesFinais') opcoesFinais: ElementRef;
 
   final = false;
 
@@ -39,37 +41,46 @@ export class MapPage {
   }
 
   ionViewDidEnter() {
-    console.log('mapa');
     this.uid = this.navParams.get('id');
     this.id_motorista = this.navParams.get('id_motorista');
+    console.log('entrando pagina map', this.uid, this.id_motorista);
     this.initializeMap();
-    this.pegarDados();
+
+    this.db.database.ref('pedidos').child(this.uid).on('value', this.pegarDados.bind(this))
   }
 
-  pegarDados() {
-    this.db.database.ref('pedidos').child(this.uid).once('value', (snapshot) => {
-      let info = snapshot.val();
-      if (info != null) {
-        this.todasInfoCliente = info;
-        if(info.motorista == this.id_motorista) {
-          this.final = true;
-        }
-          this.usuarioPosition = info.origemLat + ", " + info.origemLng;
-          this.destinoPosition = info.destinoLat + ", " + info.destinoLng;
-          this.pegarLocalizacao();
-      } else {
-        this.alertCtrl.create({
-          title: 'Usuario cancelou a corrida',
-          cssClass: 'alertDanger',
-          buttons: [{
-            text: 'Voltar',
-            handler: () => {
-              this.navCtrl.setRoot(HomePage);
-            }
-          }]
-        }).present();
+  ionViewWillLeave() {
+    console.log('saindo pagina map')
+    this.db.database.ref('pedidos').child(this.uid).off('value')
+  }
+
+  pegarDados(snapshot) {
+    var info = snapshot.val();
+
+    if(info == null) {
+      // usuário cancelou ou a corrida foi apagada do firebase
+      this.alertCtrl.create({
+        title: 'Usuario cancelou a corrida',
+        cssClass: 'alertDanger',
+        buttons: [{
+          text: 'Voltar',
+          handler: () => {
+            this.navCtrl.setRoot(HomePage);
+          }
+        }]
+      }).present();
+
+    } else {
+      // algo foi alterado nessa linha do firebase
+      this.todasInfoCliente = info;
+      if(info.motorista == this.id_motorista) {
+        this.final = true;
       }
-    });
+
+      this.usuarioPosition = info.origemLat + ", " + info.origemLng;
+      this.destinoPosition = info.destinoLat + ", " + info.destinoLng;
+      this.pegarLocalizacao();
+    }
   }
 
   pegarLocalizacao() {
@@ -129,99 +140,45 @@ export class MapPage {
 
   opcoes() {
     if (this.final == false) {
-      this.abrirOpcoesIniciais();
+      this.toggleOpcoesIniciais();
     } else {
-      this.abrirOpcoesFinais();
+      this.toggleOpcoesFinais();
     }
   }
 
-  abrirOpcoesIniciais() {
-    console.log("abriu opções iniciais");
-    let opcoes = -35;
-    let botao = 0;
-    let interval = setInterval(function(){
-      if(opcoes <= 0){
-        document.getElementById('opcoesIniciais').style.display = "flex";
-        document.getElementById('opcoesIniciais').style.bottom = opcoes+"%";
-
-        document.getElementById('botao').style.bottom = botao+"%";
-
-        opcoes++;
-        botao++;
-      }else{
-        clearInterval(interval);
-      }
-    }, 8);
+  toggleOpcoesIniciais() {
+    if(this.opcoesIniciais.nativeElement.classList.contains('opened'))
+      this.opcoesIniciais.nativeElement.classList.remove('opened')
+    else
+      this.opcoesIniciais.nativeElement.classList.add('opened')
   }
-  abrirOpcoesFinais() {
-    console.log("abriu opções finais");
-    let opcoes = -35;
-    let botao = 0;
-    let interval = setInterval(function(){
-      if(opcoes <= 0){
-        document.getElementById('opcoesFinais').style.display = "flex";
-        document.getElementById('opcoesFinais').style.bottom = opcoes+"%";
 
-        document.getElementById('botao').style.bottom = botao+"%";
-
-        opcoes++;
-        botao++;
-      }else{
-        clearInterval(interval);
-      }
-    }, 8);
-  }
-  fecharOpcoesIniciais() {
-    let opcoes = 0;
-    let botao = 35;
-    document.getElementById('opcoesIniciais').style.display = "flex";
-    let intervalInicio = setInterval(function(){
-      if(opcoes >= -35){
-        document.getElementById('opcoesIniciais').style.bottom = opcoes+"%";
-
-        document.getElementById('botao').style.bottom = botao+"%";
-
-        opcoes--;
-        botao--;
-      }else{
-        document.getElementById('opcoesIniciais').style.display = "none";
-        clearInterval(intervalInicio);
-      }
-    }, 8);
-  }
-  fecharOpcoesFinais() {
-    let opcoes = 0;
-    let botao = 35;
-    document.getElementById('opcoesFinais').style.display = "flex";
-    let intervalFinal = setInterval(function(){
-      if(opcoes >= -35){
-        document.getElementById('opcoesFinais').style.bottom = opcoes+"%";
-
-        document.getElementById('botao').style.bottom = botao+"%";
-
-        opcoes--;
-        botao--;
-      }else{
-        document.getElementById('opcoesFinais').style.display = "none";
-        clearInterval(intervalFinal);
-      }
-    }, 8);
+  toggleOpcoesFinais() {
+    if(this.opcoesFinais.nativeElement.classList.contains('opened'))
+      this.opcoesFinais.nativeElement.classList.remove('opened')
+    else
+      this.opcoesFinais.nativeElement.classList.add('opened')
   }
 
   voltarHome(){
-    this.navCtrl.setRoot(HomePage);
+    // this.navCtrl.push(HomePage);
+    this.db.database.ref('pedidos').child(this.uid).update({
+      motorista: ""
+    }, (err:Error) => {
+      this.navCtrl.push(HomePage);
+    });
   }
 
   aceitarPedido() {
     this.db.database.ref('pedidos').child(this.uid).update({
       motorista : this.id_motorista
     }).then((data)=>{
-      console.log("foi");
-      this.verificarPedido();
+      this.toggleOpcoesIniciais();
+      this.toggleOpcoesFinais();
     });
   }
 
-  cancelarPedido() {  
+  cancelarPedido() {
     this.alertCtrl.create({
       title: 'Deseja cancelar essa corrida?',
       buttons: [{
@@ -229,8 +186,9 @@ export class MapPage {
           handler: () => {
             this.db.database.ref('pedidos').child(this.uid).update({
               motorista: ""
+            }, (err:Error) => {
+              this.navCtrl.push(HomePage);
             });
-            this.navCtrl.setRoot(HomePage);
           }
         },
         {
@@ -239,23 +197,6 @@ export class MapPage {
         }
       ]
     }).present();
-  }
-
-  verificarPedido() {
-    this.db.database.ref('pedidos').child(this.uid).on('value', (snapshot) => {
-      if (snapshot.val() == null) {
-        this.alertCtrl.create({
-          title: 'Usuario cancelou a corrida',
-          cssClass: 'alertDanger',
-          buttons: [{
-            text: 'Voltar',
-            handler: () => {
-              this.navCtrl.setRoot(HomePage);
-            }
-          }]
-        }).present();
-      }
-    });
   }
 
   corridaFinalizada() {

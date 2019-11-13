@@ -4,7 +4,7 @@
     Opções
   </div>
 
-  <div class="opcoes" id="opcoesIniciais">
+  <div class="opcoes" id="opcoesIniciais" #opcoesIniciais>
     <div class="title">
       Aceita a corrida?
     </div>
@@ -14,12 +14,12 @@
     <div class="buttonCancel buttonTamplate" (click)="voltarHome()">
       Não aceitar
     </div>
-    <div class="buttonBack buttonTamplate" (click)="fecharOpcoesIniciais()">
+    <div class="buttonBack buttonTamplate" (click)="toggleOpcoesIniciais()">
       voltar
     </div>
   </div>
 
-  <div class="opcoes" id="opcoesFinais">
+  <div class="opcoes" id="opcoesFinais" #opcoesFinais>
     <div class="title">
       Corrida em andamento
     </div>
@@ -29,7 +29,7 @@
     <div class="buttonCancel buttonTamplate" (click)="cancelarPedido()">
       Cancelar corrida
     </div>
-    <div class="buttonBack buttonTamplate" (click)="fecharOpcoesFinais()">
+    <div class="buttonBack buttonTamplate" (click)="toggleOpcoesFinais()">
       voltar
     </div>
   </div>

@@ -14,7 +14,7 @@
       </ion-toolbar>
     </ion-header>
       <ion-content>
-        <button ion-item (click)= "logout()" menuClose class="buttonListMenu">          
+        <button ion-item (click)= "logout()" menuClose class="buttonListMenu">
           Sair
         </button>
       </ion-content>
@@ -34,7 +34,8 @@
   <ion-refresher (ionRefresh)="doRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-    <div *ngIf="pedidos.length > 0 && reload == false" class="list">
+
+  <div *ngIf="pedidos.length > 0 && reload == false" class="list">
       <ion-list *ngFor="let p of pedidos">
         <ion-item (click)="abrirMapa(p.getId())" class="list-pedido">
           <div class="list-nome">Nome: {{p.getUsuario()}}</div>
@@ -42,9 +43,11 @@
         </ion-item>
       </ion-list>
     </div>
+
     <div class="centerText" *ngIf="reload">
       <p>Carregando...</p>
     </div>
+
     <div class="centerText" *ngIf="pedidos.length == 0 && reload == false">
       <div>
         Deslize para buscar mais
