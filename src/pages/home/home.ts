@@ -43,55 +43,51 @@ export class HomePage {
   }
 
   ionViewWillEnter() {
-    console.log("entrando na pagina home");
-    this.afAuth.authState.subscribe(this.getCurrentUser.bind(this));
+    console.log("home");
+    this.buscarDados();
   }
-
   ionViewWillLeave() {
     console.log('saindo da pagina home')
-    this.db.database.ref('pedidos').off('value');
+    this.db.database.ref('pedidos').off();
   }
 
-  getCurrentUser(data) {
-    if (data && data.email && data.uid) {
-      this.uid = data.uid;
-      let listDB = this.db.database.ref(this.PATH).child(this.uid);
-      listDB.once('value', (snapshot) => {
-        this.userDate = snapshot.val();
-        if(this.userDate.perfil == ""){
-          this.userDate.perfil = "../assets/imgs/default-user.png";
-        }
-
-        this.db.database.ref('pedidos').on('value', this.buscarPedidos.bind(this));
-      })
-    } else {
-      this.navCtrl.push('LoginPage');
-    }
+  buscarDados(){
+    this.afAuth.authState.subscribe(data => {
+      if (data && data.email && data.uid) {
+        this.uid = data.uid;
+        let listDB = this.db.database.ref(this.PATH).child(this.uid);
+        listDB.once('value', (snapshot) => {
+          this.userDate = snapshot.val();
+          if(this.userDate.perfil == ""){
+            this.userDate.perfil = "../assets/imgs/default-user.png";
+          }
+            this.buscarPedidos();
+        })
+      } else {
+        this.navCtrl.setRoot('LoginPage');
+      }
+    });
   }
-
-  buscarPedidos(data) {
+  buscarPedidos(){
     this.reload = false;
-    this.pedidos = [];
-    if(data) {
+    this.db.database.ref('/pedidos').on('value', (data)=>{
+      this.pedidos = [];
       data.forEach((item)=>{
         let dados = item.val();
-
-        if(dados.motorista == ""){
-          let pedido = new Pedido(dados.usuario, item.key, dados.preco);
-          this.zone.run(()=> {
-            this.pedidos.push(pedido);
-          });
-        }
-        else if(dados.motorista == this.uid && dados.status == "") {
-          this.abrirMapa(item.key);
-        }
-
+      if(dados.motorista == ""){
+        let pedido = new Pedido(dados.usuario, item.key, dados.preco);
+        this.zone.run(()=> {
+          this.pedidos.push(pedido);
+        });
+      }
+      else if(dados.motorista == this.uid && dados.status == ""){
+        this.abrirMapa(item.key);
+      }
       })
-    }
+    });
   }
-
   abrirMapa(id: string){
-    this.navCtrl.push(MapPage, {
+    this.navCtrl.push(MapPage,{
       id: id,
       id_motorista: this.uid,
       pedidoPendente: false
@@ -99,7 +95,7 @@ export class HomePage {
   }
 
   logout(){
-    this.afAuth.auth.signOut().then(() =>{
+    return this.afAuth.auth.signOut().then(() =>{
       this.toast.create({
         message: this.userDate.nome+' você desconectou da sua conta',
         duration: 4000
@@ -115,7 +111,8 @@ export class HomePage {
   }
 
   doRefresh(refresher) {
-    setTimeout(() => {  
+    setTimeout(() => {
+      this.buscarPedidos();
       refresher.complete();
     }, 500);
   }
