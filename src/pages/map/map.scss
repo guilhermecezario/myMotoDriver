@@ -57,23 +57,4 @@ page-map {
     text-align: center;
     font-weight: 500;
   }
-
-  #opcoesIniciais.opened {
-    display: flex;
-    bottom: 0;
-  }
-
-  #opcoesIniciais:not(.opened) {
-    display: none;
-  }
-
-  #opcoesFinais.opened {
-    display: flex;
-    bottom: 0;
-  }
-
-  #opcoesFinais:not(.opened) {
-    display: none;
-  }
-
 }

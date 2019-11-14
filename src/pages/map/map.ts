@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { IonicPage, NavParams, NavController, AlertController, ToastController } from 'ionic-angular';
+import { IonicPage, NavParams, NavController, AlertController, ToastController, LoadingController } from 'ionic-angular';
 import { Geolocation } from '@ionic-native/geolocation';
-import { AngularFireDatabase, snapshotChanges } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import { HomePage } from '../home/home';
 
 declare var google: any;
@@ -37,7 +37,8 @@ export class MapPage {
     private db: AngularFireDatabase,
     public navCtrl: NavController,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController) {
+    private toastCtrl: ToastController,
+    private load: LoadingController) {
   }
 
   ionViewDidEnter() {
@@ -140,24 +141,58 @@ export class MapPage {
 
   opcoes() {
     if (this.final == false) {
-      this.toggleOpcoesIniciais();
+      this.toggleOpcoes('opcoesIniciais');
     } else {
-      this.toggleOpcoesFinais();
+      this.toggleOpcoes('opcoesFinais');
     }
   }
 
-  toggleOpcoesIniciais() {
-    if(this.opcoesIniciais.nativeElement.classList.contains('opened'))
-      this.opcoesIniciais.nativeElement.classList.remove('opened')
-    else
-      this.opcoesIniciais.nativeElement.classList.add('opened')
+  toggleOpcoes(opcao) {
+    if(document.getElementById(opcao).style.display != 'flex'){
+      console.log("abriu");
+      document.getElementById(opcao).style.display = "flex";
+      let opcoes = -35;
+      let botao = 0;
+      let interval = setInterval(function(){
+      if(opcoes <= 0){
+        document.getElementById(opcao).style.bottom = opcoes+"%";
+
+        document.getElementById('botao').style.bottom = botao+"%";
+
+        opcoes++;
+        botao++;
+      }else{
+        clearInterval(interval);
+      }
+    }, 8);
+    }else{
+      console.log("fechou");
+      let opcoes = 0;
+      let botao = 35;
+      document.getElementById(opcao).style.display = "flex";
+      let intervalInicio = setInterval(function(){
+      if(opcoes >= -35){
+        document.getElementById(opcao).style.bottom = opcoes+"%";
+
+        document.getElementById('botao').style.bottom = botao+"%";
+
+        opcoes--;
+        botao--;
+      }else{
+        document.getElementById(opcao).style.display = "none";
+        clearInterval(intervalInicio);
+      }
+    }, 8);
+    }
   }
 
   toggleOpcoesFinais() {
-    if(this.opcoesFinais.nativeElement.classList.contains('opened'))
-      this.opcoesFinais.nativeElement.classList.remove('opened')
-    else
-      this.opcoesFinais.nativeElement.classList.add('opened')
+    if(this.opcoesFinais.nativeElement.classList.contains('opened')){
+      this.opcoesFinais.nativeElement.classList.remove('opened');
+      this.opcoesFinais.nativeElement.classList.add('close');
+    }else{
+      this.opcoesFinais.nativeElement.classList.add('opened');
+    }
   }
 
   voltarHome(){
@@ -165,16 +200,24 @@ export class MapPage {
     this.db.database.ref('pedidos').child(this.uid).update({
       motorista: ""
     }, (err:Error) => {
-      this.navCtrl.push(HomePage);
+      this.navCtrl.pop();
     });
   }
 
   aceitarPedido() {
+    let loader = this.load.create({
+
+    });
+    loader.present();
     this.db.database.ref('pedidos').child(this.uid).update({
       motorista : this.id_motorista
     }).then((data)=>{
-      this.toggleOpcoesIniciais();
-      this.toggleOpcoesFinais();
+      this.toggleOpcoes('opcoesIniciais');
+      loader.dismiss();
+      this.toastCtrl.create({
+        message: 'Pedido aceito',
+        duration: 2500
+      }).present();
     });
   }
 
@@ -187,7 +230,8 @@ export class MapPage {
             this.db.database.ref('pedidos').child(this.uid).update({
               motorista: ""
             }, (err:Error) => {
-              this.navCtrl.push(HomePage);
+              this.navCtrl.pop();
+              this.db.database.ref('pedidos').child(this.uid).off('value')
             });
           }
         },
@@ -213,7 +257,7 @@ export class MapPage {
               {
                 text: 'Ok',
                 handler: () => {
-                  this.navCtrl.setRoot(HomePage);
+                  this.navCtrl.pop();
                 }
               }
             ]

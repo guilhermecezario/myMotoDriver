@@ -99,12 +99,12 @@ export class HomePage {
   }
 
   logout(){
-    return this.afAuth.auth.signOut().then(() =>{
+    this.afAuth.auth.signOut().then(() =>{
       this.toast.create({
         message: this.userDate.nome+' você desconectou da sua conta',
         duration: 4000
       }).present();
-      this.navCtrl.push('LoginPage');
+      this.navCtrl.setRoot('LoginPage');
     }).catch((error) => console.log(error))
   }
 
@@ -115,8 +115,7 @@ export class HomePage {
   }
 
   doRefresh(refresher) {
-    setTimeout(() => {
-      this.buscarPedidos();
+    setTimeout(() => {  
       refresher.complete();
     }, 500);
   }
